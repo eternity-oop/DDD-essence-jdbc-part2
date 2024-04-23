@@ -7,6 +7,7 @@ import org.eternity.food.domain.generic.money.Money;
 import org.eternity.food.domain.shop.Shop;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -22,22 +23,23 @@ public class Order extends AggregateRoot<Order, Long> {
 
     private Long userId;
 
-    private AggregateReference<Shop, Long> shopId;
+    @Column("SHOP_ID")
+    private AggregateReference<Shop, Long> shop;
 
     @MappedCollection(idColumn = "ORDER_ID")
     private Set<OrderLineItem> orderLineItems = new HashSet<>();
 
     private LocalDateTime orderedTime;
 
-    public Order(Long userId, Long shopId, Set<OrderLineItem> items) {
-        this(null, userId, shopId, items, LocalDateTime.now());
+    public Order(Long userId, AggregateReference<Shop, Long> shop, Set<OrderLineItem> items) {
+        this(null, userId, shop, items, LocalDateTime.now());
     }
 
     @Builder
-    public Order(Long id, Long userId, Long shopId, Set<OrderLineItem> items, LocalDateTime orderedTime) {
+    public Order(Long id, Long userId, AggregateReference<Shop, Long> shop, Set<OrderLineItem> items, LocalDateTime orderedTime) {
         this.id = id;
         this.userId = userId;
-        this.shopId = AggregateReference.to(shopId);
+        this.shop = shop;
         this.orderedTime = orderedTime;
         this.orderLineItems = items;
     }

@@ -18,7 +18,7 @@ public class Menu extends AggregateRoot<Menu, Long> {
     private Long id;
 
     @Column("SHOP_ID")
-    private AggregateReference<Shop, Long> shopId;
+    private AggregateReference<Shop, Long> shop;
 
     @Column("MENU_NAME")
     private String name;
@@ -31,14 +31,14 @@ public class Menu extends AggregateRoot<Menu, Long> {
     @MappedCollection(idColumn = "MENU_ID")
     private Set<OptionGroup> groups = new HashSet<>();
 
-    public Menu(Long shopId, String name, String description) {
-        this(null, shopId, name, description, false, new HashSet<>());
+    public Menu(AggregateReference<Shop, Long> shop, String name, String description) {
+        this(null, shop, name, description, false, new HashSet<>());
     }
 
     @Builder
-    public Menu(Long id, Long shopId, String name, String description, boolean open, Set<OptionGroup> groups) {
+    public Menu(Long id, AggregateReference<Shop, Long> shop, String name, String description, boolean open, Set<OptionGroup> groups) {
         this.id = id;
-        this.shopId = AggregateReference.to(shopId);
+        this.shop = shop;
         this.name = name;
         this.description = description;
         this.open = open;

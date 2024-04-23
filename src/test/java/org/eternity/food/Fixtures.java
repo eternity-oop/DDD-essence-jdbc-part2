@@ -10,6 +10,7 @@ import org.eternity.food.order.Order;
 import org.eternity.food.order.OrderLineItem;
 import org.eternity.food.order.OrderOption;
 import org.eternity.food.order.OrderOptionGroup;
+import org.springframework.data.jdbc.core.mapping.AggregateReference;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
@@ -43,7 +44,7 @@ public class Fixtures {
     public static Menu.MenuBuilder aMenu() {
         return Menu.builder()
                 .id(MENU_ID)
-                .shopId(SHOP_ID)
+                .shop(AggregateReference.to(SHOP_ID))
                 .name("삼겹살 1인세트")
                 .description("삼겹살 + 야채세트 + 김치찌개")
                 .open(true)
@@ -72,7 +73,7 @@ public class Fixtures {
         return Cart.builder()
                 .id(CART_ID)
                 .userId(1L)
-                .shopId(1L)
+                .shop(AggregateReference.to(1L))
                 .items(Collections.singleton(aCartLineItem().build()));
     }
 
@@ -103,7 +104,7 @@ public class Fixtures {
         return Order.builder()
                 .id(ORDER_ID)
                 .userId(1L)
-                .shopId(1L)
+                .shop(AggregateReference.to(1L))
                 .orderedTime(LocalDateTime.of(2020, 1, 1, 12, 0))
                 .items(Collections.singleton(anOrderLineItem().build()));
     }

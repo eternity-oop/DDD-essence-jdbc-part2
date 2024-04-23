@@ -9,6 +9,7 @@ import org.eternity.food.order.Order;
 import org.eternity.food.order.OrderLineItem;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 
 import java.util.HashSet;
@@ -24,20 +25,21 @@ public class Cart extends AggregateRoot<Cart, Long> {
 
     private Long userId;
 
-    private AggregateReference<Shop, Long> shopId;
+    @Column("SHOP_ID")
+    private AggregateReference<Shop, Long> shop;
 
     @MappedCollection(idColumn = "CART_ID")
     private Set<CartLineItem> items = new HashSet<>();
 
-    public Cart(Long userId, Long shopId, Set<CartLineItem> items) {
-        this(null, userId, shopId, items);
+    public Cart(Long userId, AggregateReference<Shop, Long> shop, Set<CartLineItem> items) {
+        this(null, userId, shop, items);
     }
 
     @Builder
-    public Cart(Long id, Long userId, Long shopId, Set<CartLineItem> items) {
+    public Cart(Long id, Long userId, AggregateReference<Shop, Long> shop, Set<CartLineItem> items) {
         this.id = id;
         this.userId = userId;
-        this.shopId = AggregateReference.to(shopId);
+        this.shop = shop;
         this.items = items;
     }
 
@@ -58,7 +60,7 @@ public class Cart extends AggregateRoot<Cart, Long> {
         }
 
         if (items.isEmpty()) {
-            this.shopId = AggregateReference.to(shop.getId());
+            this.shop = AggregateReference.to(shop.getId());
         }
 
         if (!isContains(shop.getId())) {
@@ -81,7 +83,7 @@ public class Cart extends AggregateRoot<Cart, Long> {
     }
 
     public Order placeOrder() {
-        return new Order(userId, shopId.getId(), toOrderLineItems());
+        return new Order(userId, shop, toOrderLineItems());
     }
 
     private Set<OrderLineItem> toOrderLineItems() {
@@ -89,11 +91,11 @@ public class Cart extends AggregateRoot<Cart, Long> {
     }
 
     private boolean isContains(Long shopId) {
-        return this.shopId != null && this.shopId.equals(AggregateReference.to(shopId));
+        return this.shop != null && this.shop.equals(AggregateReference.to(shopId));
     }
 
     private void start(Shop shop) {
-        this.shopId = AggregateReference.to(shop.getId());
+        this.shop = AggregateReference.to(shop.getId());
         this.items.clear();
     }
 }
